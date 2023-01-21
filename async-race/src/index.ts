@@ -1,9 +1,9 @@
 import './main.scss';
 import './fonts/fonts.scss'
-import car from './images/car.svg'
+import car from './images/dice.png'
 
 
-function component(text) {
+function component(text: string | null) {
   const element = document.createElement('h1');
   element.textContent = text;
   return element;
