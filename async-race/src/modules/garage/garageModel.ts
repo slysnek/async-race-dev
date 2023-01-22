@@ -12,7 +12,7 @@ export class GarageModel implements Model{
   garageAPI: GarageMethods = new GarageMethods;
   winnersAPI: WinnersMethods = new WinnersMethods;
 
-   getNumOfCars(){
+   getCars(){
     return this.garageAPI.getCars().then((data) => {
       this.cars = data;
       return this.cars

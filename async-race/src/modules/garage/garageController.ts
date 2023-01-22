@@ -8,8 +8,8 @@ export class GarageController implements Controller{
     this.model = new GarageModel;
   }
 
-  numOfCars(){
-    return this.model.getNumOfCars()
+  getCars(){
+    return this.model.getCars()
   }
 
 }

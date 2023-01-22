@@ -1,5 +1,6 @@
 import { View } from "../types/view";
 import { GarageController } from "./garageController";
+import { CarComponent } from "./carComponent";
 
 export class GarageView implements View{
   controller: GarageController;
@@ -21,18 +22,21 @@ export class GarageView implements View{
   private resetButton: HTMLButtonElement;
   private addHundredCars: HTMLButtonElement;
   private startRace: HTMLButtonElement;
+
   private carsCounter: HTMLHeadingElement;
   private carsCounterNumber: HTMLSpanElement;
 
+  private carComponent: CarComponent
 
   constructor(root: HTMLElement) {
     this.root = root;
     this.controller = new GarageController;
-
+    this.carComponent = new CarComponent
+    //buttons
     this.pageButtonsWrapper = document.createElement('div')
     this.garageButton = document.createElement('button')
     this.winnersButton = document.createElement('button')
-
+    //Create/Update
     this.carCreateWrapper = document.createElement('div')
     this.carUpdateWrapper = document.createElement('div')
     this.carCreateInputText = document.createElement('input')
@@ -41,15 +45,15 @@ export class GarageView implements View{
     this.carUpdateInputColor = document.createElement('input')
     this.carCreateButton = document.createElement('button')
     this.carUpdateButton = document.createElement('button')
-
+    //Action Buttons
     this.actionsWrapper = document.createElement('div')
     this.resetButton = document.createElement('button')
     this.addHundredCars = document.createElement('button')
     this.startRace = document.createElement('button')
-
+    //Car Counter
     this.carsCounter = document.createElement('h3')
     this.carsCounterNumber = document.createElement('span')
-
+    //appending
     this.pageButtonsWrapper.appendChild(this.garageButton)
     this.pageButtonsWrapper.appendChild(this.winnersButton)
 
@@ -64,7 +68,7 @@ export class GarageView implements View{
     this.actionsWrapper.appendChild(this.addHundredCars)
     this.actionsWrapper.appendChild(this.startRace)
 
-
+    //setting attributes
     this.carsCounter.textContent = 'Total Cars: '
     this.carsCounterNumber.textContent = 'TODO'
     this.carsCounter.appendChild(this.carsCounterNumber)
@@ -84,14 +88,14 @@ export class GarageView implements View{
     //test
 
     this.garageButton.addEventListener('click', () => {
-      this.updateNumberofCars()
+      this.start()
     })
     
   }  
 
   updateNumberofCars = () => {
-    this.controller.numOfCars().then((value) => {
-      this.carsCounterNumber.textContent = value.length.toString();
+    this.controller.getCars().then((cars) => {
+      this.carsCounterNumber.textContent = cars.length.toString();
     })
   }
 
@@ -101,6 +105,7 @@ export class GarageView implements View{
     this.root.appendChild(this.carUpdateWrapper)
     this.root.appendChild(this.actionsWrapper)
     this.root.appendChild(this.carsCounter)
+    this.root.appendChild(this.carComponent.giveCar())
   }
   
 }
