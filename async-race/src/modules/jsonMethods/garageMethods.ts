@@ -1,3 +1,5 @@
+import {GetCarsResponse} from '../types/data';
+
 export class GarageMethods {
   url: string;
   garage: string;
@@ -13,9 +15,13 @@ _limit=[integer]
 If _limit param is passed api returns a header X-Total-Count that countains total number of records.*/
   getCars = async () => {
     const data = await fetch(this.url + this.garage);
-    const textData = await data.json()
-    console.log(textData)
-    return textData
+    const textData: GetCarsResponse = await data.json();
+    if(textData){
+      console.log(textData);
+      return textData
+    } else {
+      throw 'Cars did not load'
+    }
   }
 
   getCar = async (id: number) => {
