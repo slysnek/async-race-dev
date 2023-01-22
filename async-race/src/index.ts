@@ -4,3 +4,5 @@ import {GarageView} from './modules/garage/garageView'
 const garageView = new GarageView(document.body);
 
 garageView.start()
+garageView.updateNumberofCars()
+garageView.displayCars()

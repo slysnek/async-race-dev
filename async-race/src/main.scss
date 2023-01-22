@@ -1,8 +1,12 @@
 $font-size: 1rem;
-$font-color: lch(28 99 35);
+$font-color: blue;
 
 html {
   font-size: $font-size;
   font-family: 'Roboto Mono';
   color: $font-color;
+}
+
+body{
+  background-color: gray;
 }

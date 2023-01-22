@@ -1,6 +1,7 @@
 import { View } from "../types/view";
 import { GarageController } from "./garageController";
 import { CarComponent } from "./carComponent";
+import { Car } from "../types/data";
 
 export class GarageView implements View{
   controller: GarageController;
@@ -26,12 +27,12 @@ export class GarageView implements View{
   private carsCounter: HTMLHeadingElement;
   private carsCounterNumber: HTMLSpanElement;
 
-  private carComponent: CarComponent
+  private carComponent!: CarComponent
+  private carInstance!: Car;
 
   constructor(root: HTMLElement) {
     this.root = root;
     this.controller = new GarageController;
-    this.carComponent = new CarComponent
     //buttons
     this.pageButtonsWrapper = document.createElement('div')
     this.garageButton = document.createElement('button')
@@ -87,9 +88,9 @@ export class GarageView implements View{
 
     //test
 
-    this.garageButton.addEventListener('click', () => {
-      this.start()
-    })
+/*     this.garageButton.addEventListener('click', () => {
+
+    }) */
     
   }  
 
@@ -99,13 +100,20 @@ export class GarageView implements View{
     })
   }
 
+  displayCars = () => {
+    this.controller.getCars().then((cars) => {
+      cars.forEach((car)=>{
+        this.root.appendChild(new CarComponent(car).giveCar())
+      })
+    })
+  }
+
   start() {
     this.root.appendChild(this.pageButtonsWrapper)
     this.root.appendChild(this.carCreateWrapper)
     this.root.appendChild(this.carUpdateWrapper)
     this.root.appendChild(this.actionsWrapper)
     this.root.appendChild(this.carsCounter)
-    this.root.appendChild(this.carComponent.giveCar())
   }
   
 }
