@@ -1,4 +1,4 @@
-import {GetCarsResponse} from '../types/data';
+import {Car, GetCarsResponse} from '../types/data';
 
 export class GarageMethods {
   url: string;
@@ -31,12 +31,18 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
   }
 
   //needs data
-  createNewCar = async () => {
+  createNewCar = async (name:string, color:string) => {
     const data = await fetch(this.url + this.garage, {
       method: 'POST',
+      body: JSON.stringify(
+        {
+          name: name,
+          color: color
+        }
+      ),
       headers: { 'Content-Type': 'application/json' }
     });
-    const textData = await data.json()
+    const textData: Car = await data.json()
     console.log(textData)
     return textData
   }

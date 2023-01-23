@@ -12,4 +12,12 @@ export class GarageController implements Controller{
     return this.model.getCars()
   }
 
+  createCar(name:string, color:string){
+    return this.model.createCar(name, color)
+  }
+
+  create100cars(){
+    return this.model.create100cars()
+  }
+
 }

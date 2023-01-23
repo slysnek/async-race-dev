@@ -86,13 +86,36 @@ export class GarageView implements View{
     this.addHundredCars.textContent = '+100 cars'
     this.startRace.textContent = 'Start Race'
 
-    //test
+    this.carCreateButton.addEventListener('click', () => {
+      const name = this.carCreateInputText.textContent;
+      const color = this.carCreateInputColor.value;
+      this.createCar(name, color)
+    })
 
-/*     this.garageButton.addEventListener('click', () => {
-
-    }) */
+    this.addHundredCars.addEventListener('click', () => {
+      this.create100cars()
+      this.updateNumberofCars()
+    })
     
   }  
+
+  createCar = (name:string|null, color:string) => {
+    name = this.carCreateInputText.value;
+    if(name === ''){
+      alert('Name cannot be empty!')
+      return;
+    }
+    color = this.carCreateInputColor.value;
+    this.controller.createCar(name, color)?.then((car) => {
+      console.log(car)
+      this.updateNumberofCars()
+    })
+  }
+
+  create100cars = () => {
+    this.controller.create100cars()
+    this.updateNumberofCars()
+  }
 
   updateNumberofCars = () => {
     this.controller.getCars().then((cars) => {
