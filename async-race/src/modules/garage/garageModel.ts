@@ -9,6 +9,7 @@ export class GarageModel implements Model{
   cars: GetCarsResponse | undefined;
   randomName1: string[];
   randomName2: string[];
+  selectedCar: Car;
 
   engineAPI: EngineMethods = new EngineMethods;
   garageAPI: GarageMethods = new GarageMethods;
@@ -17,6 +18,11 @@ export class GarageModel implements Model{
   constructor(){
     this.randomName1 = ['Mercedes', 'Ford', 'Lada', 'Porsche', 'Renault', 'Chevrolet', 'Toyota', 'Mazda', 'Lexus', 'BMW']
     this.randomName2 = ['C600', 'Focus', 'Kalina', 'Cayene', 'Logan', 'Cruze', 'Camri', '6', 'RX510', 'X4']
+    this.selectedCar = {
+      name: 'no car',
+      color: '000000',
+      id: 0
+    }
   }
 
    getCars(){
@@ -57,6 +63,22 @@ export class GarageModel implements Model{
       color += values[Math.floor(Math.random() * 16)];
     }
     return color;
+  }
+
+  changeSelectedCar(car:Car){
+    this.selectedCar.color = car.color;
+    this.selectedCar.id = car.id;
+    this.selectedCar.name = car.name;
+    console.log(this.selectedCar);
+  }
+
+  updateSelectedCar(color:string, name:string):Promise<Car>{
+    const id = this.selectedCar.id;
+    return this.garageAPI.updateCar(id, color, name).then((car)=>{
+      this.selectedCar.color = car.color
+      this.selectedCar.name = car.name
+      return car
+    })
   }
 
 

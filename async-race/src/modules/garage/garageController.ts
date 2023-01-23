@@ -1,4 +1,5 @@
 import { Controller } from "../types/controller";
+import { Car } from "../types/data";
 import { GarageModel } from "./garageModel";
 
 export class GarageController implements Controller{
@@ -18,6 +19,14 @@ export class GarageController implements Controller{
 
   create100cars(){
     return this.model.create100cars()
+  }
+
+  changeSelectedCar(car: Car){
+    this.model.changeSelectedCar(car)
+  }
+
+  updateCar = (color:string, name:string) => {
+    return this.model.updateSelectedCar(color, name)
   }
 
 }

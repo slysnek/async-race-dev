@@ -29,6 +29,7 @@ export class GarageView implements View{
 
   private carComponent!: CarComponent
   private carInstance!: Car;
+  carComponentWrapper: HTMLDivElement;
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -54,6 +55,8 @@ export class GarageView implements View{
     //Car Counter
     this.carsCounter = document.createElement('h3')
     this.carsCounterNumber = document.createElement('span')
+    //car wrapper
+    this.carComponentWrapper = document.createElement('div')
     //appending
     this.pageButtonsWrapper.appendChild(this.garageButton)
     this.pageButtonsWrapper.appendChild(this.winnersButton)
@@ -81,13 +84,14 @@ export class GarageView implements View{
     this.winnersButton.textContent = 'Winners'
     this.carCreateButton.textContent = 'Create'
     this.carUpdateButton.textContent = 'Update'
+    this.carUpdateButton.disabled = true;
 
     this.resetButton.textContent = 'Reset'
     this.addHundredCars.textContent = '+100 cars'
     this.startRace.textContent = 'Start Race'
 
     this.carCreateButton.addEventListener('click', () => {
-      const name = this.carCreateInputText.textContent;
+      const name = this.carCreateInputText.value;
       const color = this.carCreateInputColor.value;
       this.createCar(name, color)
     })
@@ -97,10 +101,12 @@ export class GarageView implements View{
       this.updateNumberofCars()
     })
     
+    this.carUpdateButton.addEventListener('click', () => {
+      this.updateCar()
+    })
   }  
 
-  createCar = (name:string|null, color:string) => {
-    name = this.carCreateInputText.value;
+  createCar = (name:string, color:string) => {
     if(name === ''){
       alert('Name cannot be empty!')
       return;
@@ -109,12 +115,14 @@ export class GarageView implements View{
     this.controller.createCar(name, color)?.then((car) => {
       console.log(car)
       this.updateNumberofCars()
+      this.displayCars()
     })
   }
 
   create100cars = () => {
     this.controller.create100cars()
     this.updateNumberofCars()
+    this.displayCars()
   }
 
   updateNumberofCars = () => {
@@ -124,10 +132,26 @@ export class GarageView implements View{
   }
 
   displayCars = () => {
+    this.carComponentWrapper.innerHTML = ''
     this.controller.getCars().then((cars) => {
       cars.forEach((car)=>{
-        this.root.appendChild(new CarComponent(car).giveCar())
+        const test = new CarComponent(car)
+        test.selectButton.addEventListener('click', ()=>{
+          this.controller.changeSelectedCar(car)
+          this.carUpdateInputText.value = test.carName.innerHTML;
+          this.carUpdateButton.disabled = false;
+        })
+        this.carComponentWrapper.appendChild(test.giveCar())
       })
+    })
+  }
+
+  updateCar = () => {
+    const color = this.carUpdateInputColor.value;
+    const name = this.carUpdateInputText.value
+    this.controller.updateCar(color, name).then(()=>{
+      this.displayCars()
+      this.carUpdateButton.disabled = true;
     })
   }
 
@@ -137,6 +161,7 @@ export class GarageView implements View{
     this.root.appendChild(this.carUpdateWrapper)
     this.root.appendChild(this.actionsWrapper)
     this.root.appendChild(this.carsCounter)
+    this.root.appendChild(this.carComponentWrapper)
   }
   
 }

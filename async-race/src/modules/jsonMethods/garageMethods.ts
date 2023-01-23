@@ -48,7 +48,7 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
   }
 
   deleteCar = async (id: number) => {
-    const data = await fetch(this.url + this.garage + '/:' + id, {
+    const data = await fetch(this.url + this.garage + '/' + id, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
     });
@@ -57,12 +57,18 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
     return textData
   }
 
-  updateCar = async (id: number) => {
-    const data = await fetch(this.url + this.garage + '/:' + id, {
+  updateCar = async (id: number, color:string, name:string) => {
+    const data = await fetch(this.url + this.garage + '/' + id, {
       method: 'PUT',
+      body: JSON.stringify(
+        {
+          name: name,
+          color: color
+        }
+      ),
       headers: { 'Content-Type': 'application/json' }
     });
-    const textData = await data.json()
+    const textData:Car = await data.json()
     console.log(textData)
     return textData
   }

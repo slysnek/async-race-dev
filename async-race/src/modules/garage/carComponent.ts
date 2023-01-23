@@ -1,21 +1,24 @@
 import carImage from '../../images/car.svg'
 import { Car } from '../types/data';
+import { GarageController } from './garageController';
 export class CarComponent {
+  controller: GarageController
   private carComponent: HTMLDivElement;
   private carButtonsWrapper: HTMLDivElement;
-  private startButton: HTMLButtonElement;
-  private stopButton: HTMLButtonElement;
-  private selectButton: HTMLButtonElement;
-  private removeButton: HTMLButtonElement;
+  public startButton: HTMLButtonElement;
+  public stopButton: HTMLButtonElement;
+  public selectButton: HTMLButtonElement;
+  public removeButton: HTMLButtonElement;
   private roadWrapper: HTMLDivElement;
-  car: SVGSVGElement;
-  carIcon: SVGUseElement;
-  finish: SVGSVGElement;
-  carName: HTMLParagraphElement;
-  carId: HTMLParagraphElement;
+  private car: SVGSVGElement;
+  private carIcon: SVGUseElement;
+  private finish: SVGSVGElement;
+  public carName: HTMLParagraphElement;
+  public carId: HTMLParagraphElement;
 
 
   constructor(car:Car) {
+    this.controller = new GarageController;
     this.carComponent = document.createElement('div')
 
     this.carButtonsWrapper = document.createElement('div')
@@ -51,7 +54,7 @@ export class CarComponent {
     this.removeButton.textContent = 'Remove'
     this.carName.textContent = car.name;
     this.carId.textContent = `ID: ${car.id}`;
-    //test
+
     this.carIcon.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `${carImage}#car`) 
     this.car.style.width = '50px'
     this.car.style.height = '50px'
@@ -59,7 +62,7 @@ export class CarComponent {
 
   }
 
-  giveCar(){
+  public giveCar(){
     return this.carComponent;
   }
 
