@@ -33,4 +33,16 @@ export class GarageController implements Controller{
     return this.model.deleteCar(id);
   }
 
+  turnEngine=(id:number, status: 'started' | 'stopped')=>{
+    return this.model.turnEngine(id, status)
+  }
+
+  setCurrentPage = (page:number) => {
+    this.model.setCurrentPage(page);
+  }
+
+  getCurrentPage = () => {
+    return this.model.getCurrentPage();
+  }
+
 }

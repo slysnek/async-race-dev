@@ -6,3 +6,4 @@ const garageView = new GarageView(document.body);
 garageView.start()
 garageView.updateNumberofCars()
 garageView.displayCars()
+garageView.getCurrentPage()

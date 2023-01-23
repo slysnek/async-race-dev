@@ -1,21 +1,25 @@
 import { EngineMethods } from "../jsonMethods/engineMethods";
 import { GarageMethods } from "../jsonMethods/garageMethods";
 import { WinnersMethods } from "../jsonMethods/winnersMethods";
-import { GetCarsResponse } from "../types/data";
+import { GetCarsResponse, MovingCar } from "../types/data";
 import { Model } from "../types/model";
 import { Car } from "../types/data";
 
 export class GarageModel implements Model{
+
   cars: GetCarsResponse | undefined;
   randomName1: string[];
   randomName2: string[];
   selectedCar: Car;
+  movingCars?: MovingCar[];
+  currentPage: number
 
   engineAPI: EngineMethods = new EngineMethods;
   garageAPI: GarageMethods = new GarageMethods;
   winnersAPI: WinnersMethods = new WinnersMethods;
 
   constructor(){
+    this.currentPage = 1;
     this.randomName1 = ['Mercedes', 'Ford', 'Lada', 'Porsche', 'Renault', 'Chevrolet', 'Toyota', 'Mazda', 'Lexus', 'BMW']
     this.randomName2 = ['C600', 'Focus', 'Kalina', 'Cayene', 'Logan', 'Cruze', 'Camri', '6', 'RX510', 'X4']
     this.selectedCar = {
@@ -85,6 +89,26 @@ export class GarageModel implements Model{
     return this.garageAPI.deleteCar(id).then(()=>{
       this.cars?.filter((el)=> el.id !== id)
     })
+  }
+
+  turnEngine(id: number, status: 'started' | 'stopped'){
+    return this.engineAPI.turnEngine(id, status).then((value) => {
+      const movingCar:MovingCar = {
+        velocity: value.velocity,
+        distance: value.distance,
+        id: id
+      }
+      this.movingCars?.push(movingCar);
+      return movingCar;
+    })
+  }
+
+  setCurrentPage = (page:number) => {
+    this.currentPage = page;
+  }
+
+  getCurrentPage = () => {
+    return this.currentPage;
   }
 
 
