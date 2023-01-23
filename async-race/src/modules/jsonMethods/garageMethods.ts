@@ -25,7 +25,7 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
 
   getCar = async (id: number) => {
     const data = await fetch(this.url + this.garage + '/' + id);
-    const textData = await data.json()
+    const textData:Car = await data.json()
     return textData
   }
 

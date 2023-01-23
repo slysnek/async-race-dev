@@ -1,13 +1,14 @@
 import { EngineMethods } from "../jsonMethods/engineMethods";
 import { GarageMethods } from "../jsonMethods/garageMethods";
 import { WinnersMethods } from "../jsonMethods/winnersMethods";
-import { GetCarsResponse, MovingCar } from "../types/data";
+import { GetCarsResponse, GetWinnersResponse, MovingCar } from "../types/data";
 import { Model } from "../types/model";
 import { Car } from "../types/data";
 
 export class GarageModel implements Model{
 
   cars: GetCarsResponse | undefined;
+  winners: GetWinnersResponse | undefined 
   randomName1: string[];
   randomName2: string[];
   selectedCar: Car;
@@ -34,6 +35,10 @@ export class GarageModel implements Model{
       this.cars = data;
       return this.cars
     })
+  }
+
+  getCar(id:number){
+    return this.garageAPI.getCar(id)
   }
 
   createCar(name:string, color:string){
@@ -113,6 +118,13 @@ export class GarageModel implements Model{
 
   getCurrentPage = () => {
     return this.currentPage;
+  }
+
+  getWinners = () => {
+    return this.winnersAPI.getWinners().then((data) => {
+      this.winners = data;
+      return this.winners
+    })
   }
 
 

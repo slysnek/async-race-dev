@@ -1,12 +1,17 @@
 import { View } from "../types/view";
 import { GarageController } from "./garageController";
 import { CarComponent } from "./carComponent";
-import { Car, GetCarsResponse } from "../types/data";
+import { Car, GetCarsResponse, WinnerCar } from "../types/data";
 import './garageView.scss'
+import { WinnersMethods } from "../jsonMethods/winnersMethods";
 
-export class GarageView implements View{
+export class GarageView implements View {
   controller: GarageController;
   root: HTMLElement;
+
+  private garageSection: HTMLElement;
+  private winnersSection: HTMLElement;
+
   private garageButton: HTMLButtonElement;
   private winnersButton: HTMLButtonElement;
 
@@ -37,10 +42,22 @@ export class GarageView implements View{
   private buttonRight: HTMLButtonElement;
   private currentPageWrapper: HTMLDivElement;
   private currentPageNumber: HTMLSpanElement;
+  winnersCounter: HTMLHeadingElement;
+  winnersCounterNumber: HTMLSpanElement;
+  winnersTable: HTMLDivElement;
+  winnersPlace: HTMLDivElement;
+  winnersColor: HTMLDivElement;
+  winnersName: HTMLDivElement;
+  winnersWins: HTMLDivElement;
+  winnersTime: HTMLDivElement;
 
   constructor(root: HTMLElement) {
     this.root = root;
     this.controller = new GarageController;
+    //sections
+    this.garageSection = document.createElement('div')
+    this.winnersSection = document.createElement('div')
+
     //buttons
     this.pageButtonsWrapper = document.createElement('div')
     this.garageButton = document.createElement('button')
@@ -70,6 +87,19 @@ export class GarageView implements View{
     this.currentPageNumber = document.createElement('span')
     //car wrapper
     this.carComponentWrapper = document.createElement('div')
+
+    //WinnersSection
+    this.winnersCounter = document.createElement('h3')
+    this.winnersCounterNumber = document.createElement('span')
+
+    this.winnersTable = document.createElement('div')
+    this.winnersPlace = document.createElement('div')
+    this.winnersColor = document.createElement('div')
+    this.winnersName = document.createElement('div')
+    this.winnersWins = document.createElement('div')
+    this.winnersTime = document.createElement('div')
+
+
     //appending
     this.pageButtonsWrapper.appendChild(this.garageButton)
     this.pageButtonsWrapper.appendChild(this.winnersButton)
@@ -92,6 +122,28 @@ export class GarageView implements View{
     this.currentPageNumber.textContent = 'loading..'
     this.currentPage.appendChild(this.currentPageNumber)
 
+    this.winnersCounter.textContent = 'Winners: '
+    this.winnersCounterNumber.textContent = 'loading.. '
+    this.winnersCounter.appendChild(this.winnersCounterNumber)
+
+    this.winnersTable.appendChild(this.winnersPlace)
+    this.winnersTable.appendChild(this.winnersColor)
+    this.winnersTable.appendChild(this.winnersName)
+    this.winnersTable.appendChild(this.winnersWins)
+    this.winnersTable.appendChild(this.winnersTime)
+
+    //append to garage section
+    this.garageSection.appendChild(this.carCreateWrapper)
+    this.garageSection.appendChild(this.carUpdateWrapper)
+    this.garageSection.appendChild(this.actionsWrapper)
+    this.garageSection.appendChild(this.carsCounter)
+    this.garageSection.appendChild(this.currentPageWrapper)
+    this.garageSection.appendChild(this.carComponentWrapper)
+
+    //append to winners section
+    this.winnersSection.appendChild(this.winnersCounter)
+    this.winnersSection.appendChild(this.winnersTable)
+
     //setting attributes
     this.carsCounter.textContent = 'Total Cars: '
     this.carsCounterNumber.textContent = 'loading...'
@@ -99,7 +151,7 @@ export class GarageView implements View{
 
     this.carCreateInputColor.type = 'color'
     this.carUpdateInputColor.type = 'color'
-    
+
     this.garageButton.textContent = 'Garage'
     this.winnersButton.textContent = 'Winners'
     this.carCreateButton.textContent = 'Create'
@@ -113,31 +165,55 @@ export class GarageView implements View{
     this.buttonLeft.textContent = '<'
     this.buttonRight.textContent = '>'
 
+    this.winnersTable.classList.add('table')
+
+    this.winnersPlace.classList.add('table-section')
+    this.winnersColor.classList.add('table-section')
+    this.winnersName.classList.add('table-section')
+    this.winnersWins.classList.add('table-section')
+    this.winnersTime.classList.add('table-section')
+
+    this.winnersPlace.textContent = 'Place'
+    this.winnersColor.textContent = 'Color'
+    this.winnersName.textContent = 'Name'
+    this.winnersWins.textContent = 'Wins'
+    this.winnersTime.textContent = 'Time'
+
     this.carCreateButton.addEventListener('click', () => {
       const name = this.carCreateInputText.value;
       const color = this.carCreateInputColor.value;
       this.createCar(name, color)
     })
 
+
+    this.garageButton.addEventListener('click', () => {
+      this.changeView()
+    })
+
+    this.winnersButton.addEventListener('click', () => {
+      this.changeView()
+    })
+
     this.addHundredCars.addEventListener('click', () => {
       this.create100cars()
       this.updateNumberofCars()
     })
-    
+
     this.carUpdateButton.addEventListener('click', () => {
       this.updateCar()
     })
 
-    this.buttonRight.addEventListener('click', ()=>{
+    this.buttonRight.addEventListener('click', () => {
       this.nextPage()
     })
-    this.buttonLeft.addEventListener('click', ()=>{
+    this.buttonLeft.addEventListener('click', () => {
       this.prevPage()
     })
-  }  
+  }
 
-  createCar = (name:string, color:string) => {
-    if(name === ''){
+  //garage methods
+  createCar = (name: string, color: string) => {
+    if (name === '') {
       alert('Name cannot be empty!')
       return;
     }
@@ -164,73 +240,83 @@ export class GarageView implements View{
   displayCars = () => {
     this.carComponentWrapper.innerHTML = ''
     this.controller.getCars().then((cars) => {
-/*       const carArray: CarComponent[] = []; */
+      /*       const carArray: CarComponent[] = []; */
       const paginatedCars = this.updatePagination(cars)
-      paginatedCars.forEach((car)=>{
+      paginatedCars.forEach((car) => {
         const newCar = new CarComponent(car)
-        newCar.selectButton.addEventListener('click', ()=>{
+        newCar.selectButton.addEventListener('click', () => {
           this.controller.changeSelectedCar(car)
           this.carUpdateInputText.value = newCar.carName.innerHTML;
           this.carUpdateButton.disabled = false;
         })
-        newCar.removeButton.addEventListener('click', ()=>{
-          this.controller.deleteCar(car.id).then(()=>{
+        newCar.removeButton.addEventListener('click', () => {
+          this.controller.deleteCar(car.id).then(() => {
             this.updateNumberofCars()
             this.displayCars()
           })
         })
-        newCar.startButton.addEventListener('click', ()=>{
-          this.controller.turnEngine(car.id, 'started').then((movCar)=>{
+        newCar.startButton.addEventListener('click', () => {
+          this.controller.turnEngine(car.id, 'started').then((movCar) => {
             let xpos = 0
-            function driveAnimaton(){
+            function driveAnimaton() {
               xpos += 1;
               newCar.carEl.style.transform = `translateX(${xpos}px)`
               const trackWidth = newCar.carComponent.clientWidth - 100;
               const time = (movCar.distance / movCar.velocity) / trackWidth;
               console.log(xpos, trackWidth, time)
-              if (xpos < trackWidth){
-                setTimeout(()=> requestAnimationFrame(driveAnimaton), time)
+              if (xpos < trackWidth) {
+                setTimeout(() => requestAnimationFrame(driveAnimaton), time)
               }
             }
             driveAnimaton()
-            this.controller.turnEngineToDrive(car.id, 'drive').then((val)=>{
+            this.controller.turnEngineToDrive(car.id, 'drive').then((val) => {
               return
-            }).catch((val)=>{
+            }).catch((val) => {
               this.controller.turnEngine(car.id, 'stopped')
+              driveAnimaton()
             })
           })
         })
-        newCar.stopButton.addEventListener('click', ()=>{
+        newCar.stopButton.addEventListener('click', () => {
           this.controller.turnEngine(car.id, 'stopped')
         })
-/*         carArray.push(newCar) */
+        /*         carArray.push(newCar) */
         this.carComponentWrapper.appendChild(newCar.giveCar())
       })
     })
   }
 
+  updateCar = () => {
+    const color = this.carUpdateInputColor.value;
+    const name = this.carUpdateInputText.value
+    this.controller.updateCar(color, name).then(() => {
+      this.displayCars()
+      this.carUpdateButton.disabled = true;
+    })
+  }
 
+  //pagination
   updatePagination = (cars: GetCarsResponse) => {
     const paginationLimit = 7;
     const pageCount = Math.ceil(cars.length / paginationLimit); //44 / 7 = 9
     const currentPage = this.getCurrentPage();
     this.currentPageNumber.textContent = currentPage.toString();
 
-    if(currentPage === 1){
+    if (currentPage === 1) {
       this.buttonLeft.disabled = true;
     } else {
       this.buttonLeft.disabled = false;
     }
 
-    if(currentPage >= pageCount){
+    if (currentPage >= pageCount) {
       this.buttonRight.disabled = true;
     } else {
       this.buttonRight.disabled = false;
     }
 
-    const currentRangeMin = (currentPage-1) * paginationLimit;
+    const currentRangeMin = (currentPage - 1) * paginationLimit;
     let currentRangeMax = currentPage * paginationLimit;
-    if(currentRangeMax > cars.length){currentRangeMax = cars.length;}
+    if (currentRangeMax > cars.length) { currentRangeMax = cars.length; }
     return cars.slice(currentRangeMin, currentRangeMax)
   }
 
@@ -246,30 +332,67 @@ export class GarageView implements View{
     this.displayCars()
   }
 
-  updateCar = () => {
-    const color = this.carUpdateInputColor.value;
-    const name = this.carUpdateInputText.value
-    this.controller.updateCar(color, name).then(()=>{
-      this.displayCars()
-      this.carUpdateButton.disabled = true;
+  setCurrentPage(page: number) {
+    this.controller.setCurrentPage(page)
+  }
+  getCurrentPage() {
+    return this.controller.getCurrentPage()
+  }
+
+  //winners methods
+  getWinners = () => {
+    this.controller.getWinners().then((winners) => {
+      this.winnersCounterNumber.textContent = winners.length.toString()
+      //for debug
+      let place = 0
+      winners.forEach((winner) => {
+        this.controller.getCar(winner.id).then((car) => {
+          place++
+          const winnerCar: WinnerCar = {
+            id: winner.id,
+            wins: winner.wins,
+            time: winner.time,
+            color: car.color,
+            name: car.name
+          }
+          const timeDiv = document.createElement('p')
+          const colorDiv = document.createElement('p')
+          const winDiv = document.createElement('p')
+          const nameDiv = document.createElement('p')
+          const placeDiv = document.createElement('p')
+          timeDiv.textContent = winnerCar.time.toString()
+          colorDiv.textContent = winnerCar.color
+          winDiv.textContent = winnerCar.wins.toString()
+          nameDiv.textContent = winnerCar.name.toString()
+          placeDiv.textContent = place.toString() //debug
+
+          this.winnersPlace.appendChild(placeDiv)
+          this.winnersColor.appendChild(colorDiv)
+          this.winnersName.appendChild(nameDiv)
+          this.winnersWins.appendChild(winDiv)
+          this.winnersTime.appendChild(timeDiv)
+
+        })
+      })
     })
   }
 
-  start() {
+
+  //basic view methods
+  addGarageElements() {
     this.root.appendChild(this.pageButtonsWrapper)
-    this.root.appendChild(this.carCreateWrapper)
-    this.root.appendChild(this.carUpdateWrapper)
-    this.root.appendChild(this.actionsWrapper)
-    this.root.appendChild(this.carsCounter)
-    this.root.appendChild(this.currentPageWrapper)
-    this.root.appendChild(this.carComponentWrapper)
+    this.root.appendChild(this.garageSection)
   }
 
-  setCurrentPage(page:number){
-    this.controller.setCurrentPage(page)
+  addWinnersElements() {
+    this.root.appendChild(this.winnersSection)
+    this.winnersSection.classList.add('hidden')
   }
-  getCurrentPage(){
-    return this.controller.getCurrentPage()
+
+  changeView() {
+    this.garageSection.classList.toggle('hidden')
+    this.winnersSection.classList.toggle('hidden')
   }
-  
+
+
 }

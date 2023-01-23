@@ -1,6 +1,7 @@
 import {Controller} from './controller'
 
 export interface View {
-  start: () => void;
+  addGarageElements: () => void;
+  addWinnersElements: () => void;
   controller: Controller;
 }

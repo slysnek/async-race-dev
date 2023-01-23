@@ -13,6 +13,10 @@ export class GarageController implements Controller{
     return this.model.getCars()
   }
 
+  getCar(id:number){
+    return this.model.getCar(id)
+  }
+
   createCar(name:string, color:string){
     return this.model.createCar(name, color)
   }
@@ -49,4 +53,7 @@ export class GarageController implements Controller{
     return this.model.getCurrentPage();
   }
 
+  getWinners = () => {
+    return this.model.getWinners()
+  }
 }

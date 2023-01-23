@@ -1,3 +1,5 @@
+import { GetWinnersResponse } from "../types/data";
+
 export class WinnersMethods {
   url: string;
   winners: string;
@@ -17,7 +19,7 @@ _order=['ASC'|'DESC']
 If _limit param is passed api returns a header X-Total-Count that countains total number of records.*/
 getWinners = async () => {
   const data = await fetch(this.url + this.winners);
-  const textData = await data.json()
+  const textData:GetWinnersResponse = await data.json()
   console.log(textData)
   return textData
 }
