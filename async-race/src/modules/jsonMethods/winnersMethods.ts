@@ -42,7 +42,7 @@ createWinner = async () => {
 }
 
 deleteWinner = async (id: number) => {
-  const data = await fetch(this.url + this.winners + '/:' + id, {
+  const data = await fetch(this.url + this.winners + '/' + id, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
   });

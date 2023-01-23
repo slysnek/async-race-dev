@@ -219,7 +219,6 @@ export class GarageView implements View {
     }
     color = this.carCreateInputColor.value;
     this.controller.createCar(name, color)?.then((car) => {
-      console.log(car)
       this.updateNumberofCars()
       this.displayCars()
     })
@@ -237,6 +236,12 @@ export class GarageView implements View {
     })
   }
 
+  updateNumberofWinners = () => {
+    this.controller.getWinners().then((winners) => {
+      this.winnersName.textContent = winners.length.toString();
+    })
+  }
+
   displayCars = () => {
     this.carComponentWrapper.innerHTML = ''
     this.controller.getCars().then((cars) => {
@@ -251,8 +256,12 @@ export class GarageView implements View {
         })
         newCar.removeButton.addEventListener('click', () => {
           this.controller.deleteCar(car.id).then(() => {
-            this.updateNumberofCars()
-            this.displayCars()
+            this.controller.deleteWinner(car.id).then(()=>{
+              this.updateNumberofWinners()
+              this.updateNumberofCars()
+              this.displayCars()
+              this.getWinners()
+            })
           })
         })
         newCar.startButton.addEventListener('click', () => {
@@ -263,7 +272,6 @@ export class GarageView implements View {
               newCar.carEl.style.transform = `translateX(${xpos}px)`
               const trackWidth = newCar.carComponent.clientWidth - 100;
               const time = (movCar.distance / movCar.velocity) / trackWidth;
-              console.log(xpos, trackWidth, time)
               if (xpos < trackWidth) {
                 setTimeout(() => requestAnimationFrame(driveAnimaton), time)
               }
@@ -342,38 +350,51 @@ export class GarageView implements View {
   //winners methods
   getWinners = () => {
     this.controller.getWinners().then((winners) => {
+      console.log(winners);
       this.winnersCounterNumber.textContent = winners.length.toString()
       //for debug
       let place = 0
-      winners.forEach((winner) => {
-        this.controller.getCar(winner.id).then((car) => {
-          place++
-          const winnerCar: WinnerCar = {
-            id: winner.id,
-            wins: winner.wins,
-            time: winner.time,
-            color: car.color,
-            name: car.name
-          }
-          const timeDiv = document.createElement('p')
-          const colorDiv = document.createElement('p')
-          const winDiv = document.createElement('p')
-          const nameDiv = document.createElement('p')
-          const placeDiv = document.createElement('p')
-          timeDiv.textContent = winnerCar.time.toString()
-          colorDiv.textContent = winnerCar.color
-          winDiv.textContent = winnerCar.wins.toString()
-          nameDiv.textContent = winnerCar.name.toString()
-          placeDiv.textContent = place.toString() //debug
-
-          this.winnersPlace.appendChild(placeDiv)
-          this.winnersColor.appendChild(colorDiv)
-          this.winnersName.appendChild(nameDiv)
-          this.winnersWins.appendChild(winDiv)
-          this.winnersTime.appendChild(timeDiv)
-
+      if(winners){
+        this.winnersPlace.innerHTML = ''
+        this.winnersColor.innerHTML = ''
+        this.winnersName.innerHTML = ''
+        this.winnersWins.innerHTML = ''
+        this.winnersTime.innerHTML = ''
+        winners.forEach((winner) => {
+          this.controller.getCar(winner.id).then((car) => {
+            place++
+            const winnerCar: WinnerCar = {
+              id: winner.id,
+              wins: winner.wins,
+              time: winner.time,
+              color: car.color,
+              name: car.name
+            }
+            const timeDiv = document.createElement('p')
+            const colorDiv = document.createElement('p')
+            const winDiv = document.createElement('p')
+            const nameDiv = document.createElement('p')
+            const placeDiv = document.createElement('p')
+            timeDiv.textContent = winnerCar.time.toString()
+            colorDiv.textContent = winnerCar.color
+            winDiv.textContent = winnerCar.wins.toString()
+            nameDiv.textContent = winnerCar.name.toString()
+            placeDiv.textContent = place.toString() //debug
+  
+            this.winnersPlace.appendChild(placeDiv)
+            this.winnersColor.appendChild(colorDiv)
+            this.winnersName.appendChild(nameDiv)
+            this.winnersWins.appendChild(winDiv)
+            this.winnersTime.appendChild(timeDiv)
+  
+          }).catch(() => {
+            console.log('car was deleted')
+          })
         })
-      })
+      } else{
+        return
+      }
+
     })
   }
 

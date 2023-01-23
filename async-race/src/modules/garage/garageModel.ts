@@ -78,7 +78,6 @@ export class GarageModel implements Model{
     this.selectedCar.color = car.color;
     this.selectedCar.id = car.id;
     this.selectedCar.name = car.name;
-    console.log(this.selectedCar);
   }
 
   updateSelectedCar(color:string, name:string):Promise<Car>{
@@ -124,6 +123,12 @@ export class GarageModel implements Model{
     return this.winnersAPI.getWinners().then((data) => {
       this.winners = data;
       return this.winners
+    })
+  }
+
+  deleteWinner = (id:number) => {
+    return this.winnersAPI.deleteWinner(id).then(()=>{
+      this.winners?.filter((el)=> el.id !== id)
     })
   }
 

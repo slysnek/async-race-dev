@@ -56,4 +56,8 @@ export class GarageController implements Controller{
   getWinners = () => {
     return this.model.getWinners()
   }
+
+  deleteWinner = (id:number) => {
+    return this.model.deleteWinner(id)
+  }
 }
