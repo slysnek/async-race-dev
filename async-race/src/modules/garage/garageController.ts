@@ -29,4 +29,8 @@ export class GarageController implements Controller{
     return this.model.updateSelectedCar(color, name)
   }
 
+  deleteCar = (id: number) => {
+    return this.model.deleteCar(id);
+  }
+
 }

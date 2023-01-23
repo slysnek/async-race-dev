@@ -80,6 +80,12 @@ export class GarageModel implements Model{
       return car
     })
   }
+  
+  deleteCar(id:number){
+    return this.garageAPI.deleteCar(id).then(()=>{
+      this.cars?.filter((el)=> el.id !== id)
+    })
+  }
 
 
 

@@ -135,13 +135,19 @@ export class GarageView implements View{
     this.carComponentWrapper.innerHTML = ''
     this.controller.getCars().then((cars) => {
       cars.forEach((car)=>{
-        const test = new CarComponent(car)
-        test.selectButton.addEventListener('click', ()=>{
+        const newCar = new CarComponent(car)
+        newCar.selectButton.addEventListener('click', ()=>{
           this.controller.changeSelectedCar(car)
-          this.carUpdateInputText.value = test.carName.innerHTML;
+          this.carUpdateInputText.value = newCar.carName.innerHTML;
           this.carUpdateButton.disabled = false;
         })
-        this.carComponentWrapper.appendChild(test.giveCar())
+        newCar.removeButton.addEventListener('click', ()=>{
+          this.controller.deleteCar(car.id).then(()=>{
+            this.updateNumberofCars()
+            this.displayCars()
+          })
+        })
+        this.carComponentWrapper.appendChild(newCar.giveCar())
       })
     })
   }
