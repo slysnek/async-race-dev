@@ -103,6 +103,10 @@ export class GarageModel implements Model{
     })
   }
 
+  turnEngineToDrive(id: number, status: 'drive'){
+    return this.engineAPI.turnEngineToDrive(id, status)
+  }
+
   setCurrentPage = (page:number) => {
     this.currentPage = page;
   }

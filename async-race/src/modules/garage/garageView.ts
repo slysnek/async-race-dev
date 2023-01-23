@@ -180,10 +180,24 @@ export class GarageView implements View{
           })
         })
         newCar.startButton.addEventListener('click', ()=>{
-          this.controller.turnEngine(car.id, 'started').then((val)=>{
-            const width = newCar.carComponent.clientWidth * 0.9;
-            newCar.carEl.style.transition = `${val.distance/val.velocity/1000}s`
-            newCar.carEl.style.transform = `translateX(${width}px)`
+          this.controller.turnEngine(car.id, 'started').then((movCar)=>{
+            let xpos = 0
+            function driveAnimaton(){
+              xpos += 1;
+              newCar.carEl.style.transform = `translateX(${xpos}px)`
+              const trackWidth = newCar.carComponent.clientWidth - 100;
+              const time = (movCar.distance / movCar.velocity) / trackWidth;
+              console.log(xpos, trackWidth, time)
+              if (xpos < trackWidth){
+                setTimeout(()=> requestAnimationFrame(driveAnimaton), time)
+              }
+            }
+            driveAnimaton()
+            this.controller.turnEngineToDrive(car.id, 'drive').then((val)=>{
+              return
+            }).catch((val)=>{
+              this.controller.turnEngine(car.id, 'stopped')
+            })
           })
         })
         newCar.stopButton.addEventListener('click', ()=>{
@@ -194,6 +208,7 @@ export class GarageView implements View{
       })
     })
   }
+
 
   updatePagination = (cars: GetCarsResponse) => {
     const paginationLimit = 7;
@@ -216,7 +231,6 @@ export class GarageView implements View{
     const currentRangeMin = (currentPage-1) * paginationLimit;
     let currentRangeMax = currentPage * paginationLimit;
     if(currentRangeMax > cars.length){currentRangeMax = cars.length;}
-    console.log(currentRangeMin, currentRangeMax);
     return cars.slice(currentRangeMin, currentRangeMax)
   }
 
@@ -232,8 +246,6 @@ export class GarageView implements View{
     this.displayCars()
   }
 
-  
-
   updateCar = () => {
     const color = this.carUpdateInputColor.value;
     const name = this.carUpdateInputText.value
@@ -242,10 +254,6 @@ export class GarageView implements View{
       this.carUpdateButton.disabled = true;
     })
   }
-
-/*   driveAnimation = () => {
-
-  } */
 
   start() {
     this.root.appendChild(this.pageButtonsWrapper)
@@ -261,7 +269,6 @@ export class GarageView implements View{
     this.controller.setCurrentPage(page)
   }
   getCurrentPage(){
-    console.log(this.controller.getCurrentPage());
     return this.controller.getCurrentPage()
   }
   

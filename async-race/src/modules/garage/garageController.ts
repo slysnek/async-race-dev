@@ -37,6 +37,10 @@ export class GarageController implements Controller{
     return this.model.turnEngine(id, status)
   }
 
+  turnEngineToDrive(id: number, status: 'drive'){
+    return this.model.turnEngineToDrive(id, status)
+  }
+
   setCurrentPage = (page:number) => {
     this.model.setCurrentPage(page);
   }

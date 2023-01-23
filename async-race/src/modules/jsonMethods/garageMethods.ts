@@ -17,7 +17,6 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
     const data = await fetch(this.url + this.garage);
     const textData: GetCarsResponse = await data.json();
     if(textData){
-      console.log(textData);
       return textData
     } else {
       throw 'Cars did not load'
@@ -27,7 +26,6 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
   getCar = async (id: number) => {
     const data = await fetch(this.url + this.garage + '/' + id);
     const textData = await data.json()
-    console.log(textData)
     return textData
   }
 
@@ -44,7 +42,6 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
       headers: { 'Content-Type': 'application/json' }
     });
     const textData: Car = await data.json()
-    console.log(textData)
     return textData
   }
 
@@ -54,7 +51,6 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
       headers: { 'Content-Type': 'application/json' }
     });
     const textData = await data.json()
-    console.log(textData)
     return textData
   }
 
@@ -70,7 +66,6 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
       headers: { 'Content-Type': 'application/json' }
     });
     const textData:Car = await data.json()
-    console.log(textData)
     return textData
   }
 }

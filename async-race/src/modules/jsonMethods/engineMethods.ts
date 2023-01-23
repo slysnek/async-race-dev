@@ -1,3 +1,5 @@
+import { GetTurnEngineResponse, SuccessfulDrive } from "../types/data";
+
 export class EngineMethods {
   url: string;
   engine: string;
@@ -8,21 +10,21 @@ export class EngineMethods {
   }
 
   turnEngine = async (id: number, status: 'started' | 'stopped') => {
-    const data = await fetch(this.url + this.engine, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' }
+    const data = await fetch(this.url + this.engine + '?id=' + id + '&status=' + status, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' }
     });
-    const textData = await data.json()
+    const textData: GetTurnEngineResponse = await data.json()
     console.log(textData)
     return textData
-}
-//need to turn engine to 'started' first
-turnEngineToDrive = async (id: number, status: 'drive') => {
+  }
+  //need to turn engine to 'started' first
+  turnEngineToDrive = async (id: number, status: 'drive') => {
     const data = await fetch(this.url + this.engine, {
-        method: 'PATCH',
+      method: 'PATCH',
     });
-    const textData = await data.json()
+    const textData:SuccessfulDrive = await data.json()
     console.log(textData)
     return textData
-}
+  }
 }

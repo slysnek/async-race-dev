@@ -6,6 +6,19 @@ export type GetCarsResponse = [
   }
 ]
 
+export type GetTurnEngineResponse = {
+  velocity: number,
+  distance: number
+}
+
+export type SuccessfulDrive = {
+  success: string
+}
+
+export type MovingCar = GetTurnEngineResponse & {
+  id: number,
+}
+
 export type Car = {
   name: string,
   color: string,
