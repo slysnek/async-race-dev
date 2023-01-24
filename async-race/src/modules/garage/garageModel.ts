@@ -106,7 +106,8 @@ export class GarageModel implements Model{
       if(movingCar.velocity !== 0){
         this.movingCars.push(movingCar);
       } else {
-        this.movingCars.filter((el)=> el.id !== id)
+        console.log('deleting');
+        this.movingCars = this.movingCars.filter((car)=> car.id !== id)
       }
       console.log('moving cars', this.movingCars);
       return movingCar;
