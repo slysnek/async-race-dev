@@ -1,7 +1,7 @@
 import { View } from "../types/view";
 import { GarageController } from "./garageController";
 import { CarComponent } from "./carComponent";
-import { Car, GetCarsResponse, WinnerCar } from "../types/data";
+import { Car, GetCarsResponse, MovingCar, WinnerCar } from "../types/data";
 import './garageView.scss'
 import { WinnersMethods } from "../jsonMethods/winnersMethods";
 
@@ -249,6 +249,7 @@ export class GarageView implements View {
       const paginatedCars = this.updatePagination(cars)
       paginatedCars.forEach((car) => {
         const newCar = new CarComponent(car)
+        let request: number | undefined;
         newCar.selectButton.addEventListener('click', () => {
           this.controller.changeSelectedCar(car)
           this.carUpdateInputText.value = newCar.carName.innerHTML;
@@ -264,31 +265,27 @@ export class GarageView implements View {
             })
           })
         })
+
         newCar.startButton.addEventListener('click', () => {
-          this.controller.turnEngine(car.id, 'started').then((movCar) => {
-            let xpos = 0
-            function driveAnimaton() {
-              xpos += 1;
-              newCar.carEl.style.transform = `translateX(${xpos}px)`
-              const trackWidth = newCar.carComponent.clientWidth - 100;
-              const time = (movCar.distance / movCar.velocity) / trackWidth;
-              if (xpos < trackWidth) {
-                setTimeout(() => requestAnimationFrame(driveAnimaton), time)
-              }
-            }
-            driveAnimaton()
-            this.controller.turnEngineToDrive(car.id, 'drive').then((val) => {
-              return
-            }).catch((val) => {
-              this.controller.turnEngine(car.id, 'stopped')
-              driveAnimaton()
-            })
+          newCar.stopButton.disabled = false;
+          newCar.startButton.disabled = true;
+
+          this.controller.turnEngine(car.id, 'started').then((movCar) =>{
+            const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
+            request = this.controller.animationHandler(duration, newCar.carEl)
           })
         })
+
         newCar.stopButton.addEventListener('click', () => {
-          this.controller.turnEngine(car.id, 'stopped')
+          newCar.startButton.disabled = false;
+          newCar.stopButton.disabled = true;
+
+          this.controller.turnEngine(car.id, 'stopped').then((movCar) =>{
+            const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
+            this.controller.animationHandler(duration, newCar.carEl, request)
+          })
         })
-        /*         carArray.push(newCar) */
+        newCar.stopButton.disabled = true;
         this.carComponentWrapper.appendChild(newCar.giveCar())
       })
     })

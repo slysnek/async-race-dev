@@ -20,7 +20,7 @@ If _limit param is passed api returns a header X-Total-Count that countains tota
 getWinners = async () => {
   const data = await fetch(this.url + this.winners);
   const textData:GetWinnersResponse = await data.json()
-  console.log(textData)
+  console.log('winners', textData)
   return textData
 }
 

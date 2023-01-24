@@ -12,7 +12,7 @@ export class GarageModel implements Model{
   randomName1: string[];
   randomName2: string[];
   selectedCar: Car;
-  movingCars?: MovingCar[];
+  movingCars: MovingCar[];
   currentPage: number
 
   engineAPI: EngineMethods = new EngineMethods;
@@ -20,6 +20,7 @@ export class GarageModel implements Model{
   winnersAPI: WinnersMethods = new WinnersMethods;
 
   constructor(){
+    this.movingCars = [];
     this.currentPage = 1;
     this.randomName1 = ['Mercedes', 'Ford', 'Lada', 'Porsche', 'Renault', 'Chevrolet', 'Toyota', 'Mazda', 'Lexus', 'BMW']
     this.randomName2 = ['C600', 'Focus', 'Kalina', 'Cayene', 'Logan', 'Cruze', 'Camri', '6', 'RX510', 'X4']
@@ -102,7 +103,12 @@ export class GarageModel implements Model{
         distance: value.distance,
         id: id
       }
-      this.movingCars?.push(movingCar);
+      if(movingCar.velocity !== 0){
+        this.movingCars.push(movingCar);
+      } else {
+        this.movingCars.filter((el)=> el.id !== id)
+      }
+      console.log('moving cars', this.movingCars);
       return movingCar;
     })
   }
@@ -131,7 +137,32 @@ export class GarageModel implements Model{
       this.winners?.filter((el)=> el.id !== id)
     })
   }
+  animationHandler = (duration: number, carImg: SVGSVGElement, idRequest?:number) => {
+      if(idRequest){
+        cancelAnimationFrame(idRequest)
+      }
+      const start = performance.now()
+      const request = requestAnimationFrame(function animate(time) {
+        let timeFraction = (time - start) / (duration*1000);
+        if (timeFraction > 1) timeFraction = 1;
+        const progress = timing(timeFraction)
+        draw(progress)
 
+        if (timeFraction < 1) {
+          requestAnimationFrame(animate);
+        }
+      })
+      return request;
+
+      function timing(timeFraction: number) {
+        return Math.pow(timeFraction, 2)
+      }
+      function draw(progress: number){
+        const roadProgress = progress * 100
+        carImg.style.left = `calc(${roadProgress}% - ${roadProgress}px)`
+      }
+
+  }
 
 
 }

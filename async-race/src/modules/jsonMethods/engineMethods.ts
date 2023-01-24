@@ -20,7 +20,7 @@ export class EngineMethods {
   }
   //need to turn engine to 'started' first
   turnEngineToDrive = async (id: number, status: 'drive') => {
-    const data = await fetch(this.url + this.engine, {
+    const data = await fetch(this.url + this.engine + '?id=' + id + '&status=' + status, {
       method: 'PATCH',
     });
     const textData:SuccessfulDrive = await data.json()

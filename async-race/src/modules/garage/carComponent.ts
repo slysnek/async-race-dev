@@ -10,7 +10,7 @@ export class CarComponent {
   public stopButton: HTMLButtonElement;
   public selectButton: HTMLButtonElement;
   public removeButton: HTMLButtonElement;
-  private roadWrapper: HTMLDivElement;
+  public roadWrapper: HTMLDivElement;
   public carEl: SVGSVGElement;
   private carIcon: SVGUseElement;
   private finish: SVGSVGElement;
@@ -69,8 +69,10 @@ export class CarComponent {
     this.finish.style.width = '50px'
     this.finish.style.height = '50px'
     this.finish.style.position = 'absolute'
-    this.finish.style.right = '15px'
+    this.finish.style.left = 'calc(100% - 100px)';
     this.carEl.style.fill = car.color;
+
+    this.carEl.style.position = 'relative'
 
   }
 

@@ -1,5 +1,5 @@
 import { Controller } from "../types/controller";
-import { Car } from "../types/data";
+import { Car, MovingCar } from "../types/data";
 import { GarageModel } from "./garageModel";
 
 export class GarageController implements Controller{
@@ -59,5 +59,9 @@ export class GarageController implements Controller{
 
   deleteWinner = (id:number) => {
     return this.model.deleteWinner(id)
+  }
+
+  animationHandler = (duration:number, carImg:SVGSVGElement, request?:number,) => {
+    return this.model.animationHandler(duration, carImg, request)
   }
 }
