@@ -282,6 +282,11 @@ export class GarageView implements View {
           this.controller.turnEngine(car.id, 'started').then((movCar) => {
             const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
             request = this.controller.animationHandler(duration, newCar.carEl)
+            this.controller.turnEngineToDrive(movCar.id, 'drive').then(()=>{
+              console.log('my engine is okay');
+            }).catch(()=>{
+              console.log('my engine is broken but i literally do not care');
+            })
           })
         })
 
@@ -434,6 +439,11 @@ export class GarageView implements View {
           this.controller.turnEngine(car.id, 'started').then((movCar) => {
             const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
             request = this.controller.animationHandler(duration, theCar)
+            this.controller.turnEngineToDrive(movCar.id, 'drive').then(()=>{
+              console.log('my engine is okay');
+            }).catch(()=>{
+              console.log('my engine is broken but i literally do not care');
+            })
           })
         } else if (raceMode === 'reset'){
           this.controller.turnEngine(car.id, 'stopped').then((movCar) => {
