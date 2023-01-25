@@ -209,6 +209,11 @@ export class GarageView implements View {
     this.buttonLeft.addEventListener('click', () => {
       this.prevPage()
     })
+
+    this.startRace.addEventListener('click', () => {
+      this.raceAll()
+    })
+
   }
 
   //garage methods
@@ -257,7 +262,7 @@ export class GarageView implements View {
         })
         newCar.removeButton.addEventListener('click', () => {
           this.controller.deleteCar(car.id).then(() => {
-            this.controller.deleteWinner(car.id).then(()=>{
+            this.controller.deleteWinner(car.id).then(() => {
               this.updateNumberofWinners()
               this.updateNumberofCars()
               this.displayCars()
@@ -270,7 +275,7 @@ export class GarageView implements View {
           newCar.stopButton.disabled = false;
           newCar.startButton.disabled = true;
 
-          this.controller.turnEngine(car.id, 'started').then((movCar) =>{
+          this.controller.turnEngine(car.id, 'started').then((movCar) => {
             const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
             request = this.controller.animationHandler(duration, newCar.carEl)
           })
@@ -280,12 +285,13 @@ export class GarageView implements View {
           newCar.startButton.disabled = false;
           newCar.stopButton.disabled = true;
 
-          this.controller.turnEngine(car.id, 'stopped').then((movCar) =>{
+          this.controller.turnEngine(car.id, 'stopped').then((movCar) => {
             const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
             this.controller.animationHandler(duration, newCar.carEl, request)
           })
         })
         newCar.stopButton.disabled = true;
+        newCar.carEl.id = String(car.id);
         this.carComponentWrapper.appendChild(newCar.giveCar())
       })
     })
@@ -351,7 +357,7 @@ export class GarageView implements View {
       this.winnersCounterNumber.textContent = winners.length.toString()
       //for debug
       let place = 0
-      if(winners){
+      if (winners) {
         this.winnersPlace.innerHTML = ''
         this.winnersColor.innerHTML = ''
         this.winnersName.innerHTML = ''
@@ -377,18 +383,18 @@ export class GarageView implements View {
             winDiv.textContent = winnerCar.wins.toString()
             nameDiv.textContent = winnerCar.name.toString()
             placeDiv.textContent = place.toString() //debug
-  
+
             this.winnersPlace.appendChild(placeDiv)
             this.winnersColor.appendChild(colorDiv)
             this.winnersName.appendChild(nameDiv)
             this.winnersWins.appendChild(winDiv)
             this.winnersTime.appendChild(timeDiv)
-  
+
           }).catch(() => {
             console.log('car was deleted')
           })
         })
-      } else{
+      } else {
         return
       }
 
@@ -412,5 +418,20 @@ export class GarageView implements View {
     this.winnersSection.classList.toggle('hidden')
   }
 
+  //race
+
+  raceAll() {
+    this.controller.getCars().then((cars) => {
+      const paginatedCars = this.updatePagination(cars)
+      paginatedCars.forEach((car) => {
+        let request;
+        const theCar = document.getElementById(String(car.id)) as unknown as SVGSVGElement;
+        this.controller.turnEngine(car.id, 'started').then((movCar) => {
+          const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
+          request = this.controller.animationHandler(duration, theCar)
+        })
+      })
+    })
+  }
 
 }
