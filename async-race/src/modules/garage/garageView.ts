@@ -211,7 +211,11 @@ export class GarageView implements View {
     })
 
     this.startRace.addEventListener('click', () => {
-      this.raceAll()
+      this.handleRacing('race')
+    })
+
+    this.resetButton.addEventListener('click', () => {
+      this.handleRacing('reset')
     })
 
   }
@@ -420,16 +424,23 @@ export class GarageView implements View {
 
   //race
 
-  raceAll() {
+  handleRacing(raceMode: string){
     this.controller.getCars().then((cars) => {
       const paginatedCars = this.updatePagination(cars)
       paginatedCars.forEach((car) => {
-        let request;
+        let request:number;
         const theCar = document.getElementById(String(car.id)) as unknown as SVGSVGElement;
-        this.controller.turnEngine(car.id, 'started').then((movCar) => {
-          const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
-          request = this.controller.animationHandler(duration, theCar)
-        })
+        if(raceMode === 'race'){
+          this.controller.turnEngine(car.id, 'started').then((movCar) => {
+            const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
+            request = this.controller.animationHandler(duration, theCar)
+          })
+        } else if (raceMode === 'reset'){
+          this.controller.turnEngine(car.id, 'stopped').then((movCar) => {
+            const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
+            request = this.controller.animationHandler(duration, theCar, request)
+          })
+        }
       })
     })
   }
