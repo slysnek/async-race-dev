@@ -165,5 +165,11 @@ export class GarageModel implements Model{
 
   }
 
+  figureOutTheWinner(racingCars: MovingCar []){
+    console.log(racingCars, 'racingCars');
+    racingCars.sort((a,b) =>a.velocity < b.velocity ? 1 : -1)
+    return racingCars[0]
+  }
+
 
 }

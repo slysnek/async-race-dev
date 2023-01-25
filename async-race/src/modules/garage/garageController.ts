@@ -64,4 +64,8 @@ export class GarageController implements Controller{
   animationHandler = (duration:number, carImg:SVGSVGElement, request?:number,) => {
     return this.model.animationHandler(duration, carImg, request)
   }
+
+  figureOutTheWinner(racingCars: MovingCar []){
+    return this.model.figureOutTheWinner(racingCars)
+  }
 }

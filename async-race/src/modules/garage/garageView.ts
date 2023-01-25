@@ -12,6 +12,8 @@ export class GarageView implements View {
   private garageSection: HTMLElement;
   private winnersSection: HTMLElement;
 
+  private winnerMessage: HTMLElement;
+
   private garageButton: HTMLButtonElement;
   private winnersButton: HTMLButtonElement;
 
@@ -57,6 +59,8 @@ export class GarageView implements View {
     //sections
     this.garageSection = document.createElement('div')
     this.winnersSection = document.createElement('div')
+
+    this.winnerMessage = document.createElement('div')
 
     //buttons
     this.pageButtonsWrapper = document.createElement('div')
@@ -134,6 +138,7 @@ export class GarageView implements View {
 
     //append to garage section
     this.garageSection.appendChild(this.carCreateWrapper)
+    this.garageSection.appendChild(this.winnerMessage)
     this.garageSection.appendChild(this.carUpdateWrapper)
     this.garageSection.appendChild(this.actionsWrapper)
     this.garageSection.appendChild(this.carsCounter)
@@ -157,6 +162,7 @@ export class GarageView implements View {
     this.carCreateButton.textContent = 'Create'
     this.carUpdateButton.textContent = 'Update'
     this.carUpdateButton.disabled = true;
+    this.resetButton.disabled = true;
 
     this.resetButton.textContent = 'Reset'
     this.addHundredCars.textContent = '+100 cars'
@@ -172,6 +178,9 @@ export class GarageView implements View {
     this.winnersName.classList.add('table-section')
     this.winnersWins.classList.add('table-section')
     this.winnersTime.classList.add('table-section')
+
+    this.winnerMessage.classList.add('hidden')
+    this.winnerMessage.classList.add('winner-message')
 
     this.winnersPlace.textContent = 'Place'
     this.winnersColor.textContent = 'Color'
@@ -254,7 +263,6 @@ export class GarageView implements View {
   displayCars = () => {
     this.carComponentWrapper.innerHTML = ''
     this.controller.getCars().then((cars) => {
-      /*       const carArray: CarComponent[] = []; */
       const paginatedCars = this.updatePagination(cars)
       paginatedCars.forEach((car) => {
         const newCar = new CarComponent(car)
@@ -282,9 +290,9 @@ export class GarageView implements View {
           this.controller.turnEngine(car.id, 'started').then((movCar) => {
             const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
             request = this.controller.animationHandler(duration, newCar.carEl)
-            this.controller.turnEngineToDrive(movCar.id, 'drive').then(()=>{
+            this.controller.turnEngineToDrive(movCar.id, 'drive').then(() => {
               console.log('my engine is okay');
-            }).catch(()=>{
+            }).catch(() => {
               console.log('my engine is broken but i literally do not care');
             })
           })
@@ -429,30 +437,65 @@ export class GarageView implements View {
 
   //race
 
-  handleRacing(raceMode: string){
+  async handleRacing(raceMode: string) {
     this.controller.getCars().then((cars) => {
       const paginatedCars = this.updatePagination(cars)
+      const carsTimeArray: MovingCar[] = [];
+      let winner: MovingCar;
       paginatedCars.forEach((car) => {
-        let request:number;
+        let request: number;
         const theCar = document.getElementById(String(car.id)) as unknown as SVGSVGElement;
-        if(raceMode === 'race'){
+        if (raceMode === 'race') {
+
+          this.startRace.disabled = true;
+          this.resetButton.disabled = false;
           this.controller.turnEngine(car.id, 'started').then((movCar) => {
+
             const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
+            carsTimeArray.push(movCar)
             request = this.controller.animationHandler(duration, theCar)
-            this.controller.turnEngineToDrive(movCar.id, 'drive').then(()=>{
+
+            this.controller.turnEngineToDrive(movCar.id, 'drive').then(() => {
               console.log('my engine is okay');
-            }).catch(()=>{
+            }).catch(() => {
               console.log('my engine is broken but i literally do not care');
             })
+          }).then(() => {
+            winner = this.controller.figureOutTheWinner(carsTimeArray)
           })
-        } else if (raceMode === 'reset'){
+        } else if (raceMode === 'reset') {
+          this.startRace.disabled = false;
+          this.resetButton.disabled = true;
           this.controller.turnEngine(car.id, 'stopped').then((movCar) => {
             const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
             request = this.controller.animationHandler(duration, theCar, request)
           })
         }
       })
+      setTimeout(() => {
+        const winnerDuration = Math.round((winner.distance / winner.velocity / 1000) * 100) / 100;
+        let winnerName: string;
+        let winnerId: string;
+        this.controller.getCar(winner.id).then((car) => {
+          winnerName = car.name
+          winnerId = car.id.toString()
+        }).then(() => {
+          setTimeout(() => {
+            this.winnerMessage.textContent = `The winner is car with name ${winnerName} and id ${winnerId}!`
+            this.winnerMessage.classList.remove('hidden')
+            setTimeout(() => {
+              this.winnerMessage.textContent = ''
+              this.winnerMessage.classList.add('hidden')
+            }, 4000);
+          }, winnerDuration * 1000);
+
+
+        })
+
+      }, 1000);
+
     })
   }
+
 
 }
