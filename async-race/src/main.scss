@@ -1,5 +1,14 @@
 $font-size: 1rem;
 $font-color: #f0f6fc;
+$background-color: #161b22;
+$font-button-color: #161b22;
+
+$border-button-color: #4e6992;
+$background-button-color: #4b586b;
+$background-button-disabled-color:rgb(45, 52, 62);
+$background-button-disabled-font-color:#a6aaae;
+
+
 
 html {
   font-size: $font-size;
@@ -8,5 +17,31 @@ html {
 }
 
 body{
-  background-color: #161b22;
+  background-color: $background-color;
+}
+
+
+button{
+  margin: 4px;
+  background-color: $background-button-color;
+  font-size: $font-size;
+  font-family: 'Roboto Mono';
+  border: 2px solid rgba(255, 255, 255, 0);
+  border-radius: 4px;
+  color: $font-color;
+  cursor: pointer;
+}
+
+button:hover{
+  border: 2px solid $border-button-color;
+}
+
+button:disabled, button[disabled]{
+  background-color: $background-button-disabled-color;
+  color: $background-button-disabled-font-color;
+  cursor: not-allowed;
+}
+
+input{
+  margin: 4px;
 }
