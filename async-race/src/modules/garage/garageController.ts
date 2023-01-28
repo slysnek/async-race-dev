@@ -26,7 +26,7 @@ export class GarageController implements Controller{
   }
 
   changeSelectedCar(car: Car){
-    this.model.changeSelectedCar(car)
+    return this.model.changeSelectedCar(car)
   }
 
   updateCar = (color:string, name:string) => {

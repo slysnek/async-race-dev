@@ -20,7 +20,8 @@
 }
 
 .winner-message{
-  width: 300px;
+  min-width: 500px;
+  padding: 8px;
   background-color: azure;
   border: 1px solid black;
   color: black;
@@ -28,6 +29,8 @@
   position: absolute;
   margin-left: auto;
   margin-right: auto;
+  margin-top: auto;
+  margin-bottom: auto;
   left: 0;
   right: 0;
   text-align: center;

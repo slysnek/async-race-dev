@@ -3,7 +3,6 @@ import { GarageController } from "./garageController";
 import { CarComponent } from "./carComponent";
 import { Car, GetCarsResponse, MovingCar, WinnerCar } from "../types/data";
 import './garageView.scss'
-import { WinnersMethods } from "../jsonMethods/winnersMethods";
 
 export class GarageView implements View {
   controller: GarageController;
@@ -35,8 +34,7 @@ export class GarageView implements View {
   private carsCounter: HTMLHeadingElement;
   private carsCounterNumber: HTMLSpanElement;
 
-  private carComponent!: CarComponent
-  private carInstance!: Car;
+
   private carComponentWrapper: HTMLDivElement;
 
   private buttonLeft: HTMLButtonElement;
@@ -44,14 +42,14 @@ export class GarageView implements View {
   private buttonRight: HTMLButtonElement;
   private currentPageWrapper: HTMLDivElement;
   private currentPageNumber: HTMLSpanElement;
-  winnersCounter: HTMLHeadingElement;
-  winnersCounterNumber: HTMLSpanElement;
-  winnersTable: HTMLDivElement;
-  winnersPlace: HTMLDivElement;
-  winnersColor: HTMLDivElement;
-  winnersName: HTMLDivElement;
-  winnersWins: HTMLDivElement;
-  winnersTime: HTMLDivElement;
+  private winnersCounter: HTMLHeadingElement;
+  private winnersCounterNumber: HTMLSpanElement;
+  private winnersTable: HTMLDivElement;
+  private winnersPlace: HTMLDivElement;
+  private winnersColor: HTMLDivElement;
+  private winnersName: HTMLDivElement;
+  private winnersWins: HTMLDivElement;
+  private winnersTime: HTMLDivElement;
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -59,14 +57,13 @@ export class GarageView implements View {
     //sections
     this.garageSection = document.createElement('div')
     this.winnersSection = document.createElement('div')
-
+    //pop-up
     this.winnerMessage = document.createElement('div')
-
     //buttons
     this.pageButtonsWrapper = document.createElement('div')
     this.garageButton = document.createElement('button')
     this.winnersButton = document.createElement('button')
-    //Create/Update
+    //Create/Update inputs
     this.carCreateWrapper = document.createElement('div')
     this.carUpdateWrapper = document.createElement('div')
     this.carCreateInputText = document.createElement('input')
@@ -91,7 +88,6 @@ export class GarageView implements View {
     this.currentPageNumber = document.createElement('span')
     //car wrapper
     this.carComponentWrapper = document.createElement('div')
-
     //WinnersSection
     this.winnersCounter = document.createElement('h3')
     this.winnersCounterNumber = document.createElement('span')
@@ -102,8 +98,6 @@ export class GarageView implements View {
     this.winnersName = document.createElement('div')
     this.winnersWins = document.createElement('div')
     this.winnersTime = document.createElement('div')
-
-
     //appending
     this.pageButtonsWrapper.appendChild(this.garageButton)
     this.pageButtonsWrapper.appendChild(this.winnersButton)
@@ -135,7 +129,6 @@ export class GarageView implements View {
     this.winnersTable.appendChild(this.winnersName)
     this.winnersTable.appendChild(this.winnersWins)
     this.winnersTable.appendChild(this.winnersTime)
-
     //append to garage section
     this.garageSection.appendChild(this.carCreateWrapper)
     this.garageSection.appendChild(this.winnerMessage)
@@ -144,33 +137,30 @@ export class GarageView implements View {
     this.garageSection.appendChild(this.carsCounter)
     this.garageSection.appendChild(this.currentPageWrapper)
     this.garageSection.appendChild(this.carComponentWrapper)
-
     //append to winners section
     this.winnersSection.appendChild(this.winnersCounter)
     this.winnersSection.appendChild(this.winnersTable)
-
     //setting attributes
     this.carsCounter.textContent = 'Total Cars: '
     this.carsCounterNumber.textContent = 'loading...'
     this.carsCounter.appendChild(this.carsCounterNumber)
-
+    //inputs and buttons
     this.carCreateInputColor.type = 'color'
     this.carUpdateInputColor.type = 'color'
-
-    this.garageButton.textContent = 'Garage'
-    this.winnersButton.textContent = 'Winners'
     this.carCreateButton.textContent = 'Create'
     this.carUpdateButton.textContent = 'Update'
     this.carUpdateButton.disabled = true;
     this.resetButton.disabled = true;
-
     this.resetButton.textContent = 'Reset'
     this.addHundredCars.textContent = '+100 cars'
     this.startRace.textContent = 'Start Race'
 
     this.buttonLeft.textContent = '<'
     this.buttonRight.textContent = '>'
-
+    //Pages
+    this.garageButton.textContent = 'Garage'
+    this.winnersButton.textContent = 'Winners'
+    //winners table
     this.winnersTable.classList.add('table')
 
     this.winnersPlace.classList.add('table-section')
@@ -187,13 +177,12 @@ export class GarageView implements View {
     this.winnersName.textContent = 'Name'
     this.winnersWins.textContent = 'Wins'
     this.winnersTime.textContent = 'Time'
-
+    //listeners
     this.carCreateButton.addEventListener('click', () => {
       const name = this.carCreateInputText.value;
       const color = this.carCreateInputColor.value;
       this.createCar(name, color)
     })
-
 
     this.garageButton.addEventListener('click', () => {
       this.changeView()
@@ -220,7 +209,10 @@ export class GarageView implements View {
     })
 
     this.startRace.addEventListener('click', () => {
-      this.handleRacing('race')
+      this.handleRacing('race').then((carsTimeArray)=>{
+        const winner = this.controller.figureOutTheWinner(carsTimeArray)
+        this.displayWinner(winner)
+      })
     })
 
     this.resetButton.addEventListener('click', () => {
@@ -230,91 +222,19 @@ export class GarageView implements View {
   }
 
   //garage methods
-  createCar = (name: string, color: string) => {
+  private createCar = (name: string, color: string) => {
     if (name === '') {
       alert('Name cannot be empty!')
       return;
     }
     color = this.carCreateInputColor.value;
-    this.controller.createCar(name, color)?.then((car) => {
+    this.controller.createCar(name, color)?.then(() => {
       this.updateNumberofCars()
       this.displayCars()
     })
   }
 
-  create100cars = () => {
-    this.controller.create100cars()
-    this.updateNumberofCars()
-    this.displayCars()
-  }
-
-  updateNumberofCars = () => {
-    this.controller.getCars().then((cars) => {
-      this.carsCounterNumber.textContent = cars.length.toString();
-    })
-  }
-
-  updateNumberofWinners = () => {
-    this.controller.getWinners().then((winners) => {
-      this.winnersName.textContent = winners.length.toString();
-    })
-  }
-
-  displayCars = () => {
-    this.carComponentWrapper.innerHTML = ''
-    this.controller.getCars().then((cars) => {
-      const paginatedCars = this.updatePagination(cars)
-      paginatedCars.forEach((car) => {
-        const newCar = new CarComponent(car)
-        let request: number | undefined;
-        newCar.selectButton.addEventListener('click', () => {
-          this.controller.changeSelectedCar(car)
-          this.carUpdateInputText.value = newCar.carName.innerHTML;
-          this.carUpdateButton.disabled = false;
-        })
-        newCar.removeButton.addEventListener('click', () => {
-          this.controller.deleteCar(car.id).then(() => {
-            this.controller.deleteWinner(car.id).then(() => {
-              this.updateNumberofWinners()
-              this.updateNumberofCars()
-              this.displayCars()
-              this.getWinners()
-            })
-          })
-        })
-
-        newCar.startButton.addEventListener('click', () => {
-          newCar.stopButton.disabled = false;
-          newCar.startButton.disabled = true;
-
-          this.controller.turnEngine(car.id, 'started').then((movCar) => {
-            const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
-            request = this.controller.animationHandler(duration, newCar.carEl)
-            this.controller.turnEngineToDrive(movCar.id, 'drive').then(() => {
-              console.log('my engine is okay');
-            }).catch(() => {
-              console.log('my engine is broken but i literally do not care');
-            })
-          })
-        })
-
-        newCar.stopButton.addEventListener('click', () => {
-          newCar.startButton.disabled = false;
-          newCar.stopButton.disabled = true;
-
-          this.controller.turnEngine(car.id, 'stopped').then((movCar) => {
-            const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
-            this.controller.animationHandler(duration, newCar.carEl, request)
-          })
-        })
-        newCar.stopButton.disabled = true;
-        newCar.carEl.id = String(car.id);
-        this.carComponentWrapper.appendChild(newCar.giveCar())
-      })
-    })
-  }
-
-  updateCar = () => {
+  private updateCar = () => {
     const color = this.carUpdateInputColor.value;
     const name = this.carUpdateInputText.value
     this.controller.updateCar(color, name).then(() => {
@@ -323,10 +243,98 @@ export class GarageView implements View {
     })
   }
 
+  private deleteCar(car: Car) {
+    this.controller.deleteCar(car.id).then(() => {
+      this.controller.deleteWinner(car.id).then(() => {
+        this.updateNumberofWinners()
+        this.getWinners()
+        this.updateNumberofCars()
+        this.displayCars()
+      })
+    })
+  }
+
+  private create100cars = () => {
+    this.controller.create100cars()
+    this.updateNumberofCars()
+    this.displayCars()
+  }
+
+  private updateNumberofCars = () => {
+    this.controller.getCars().then((cars) => {
+      this.carsCounterNumber.textContent = cars.length.toString();
+    })
+  }
+
+  private updateNumberofWinners = () => {
+    this.controller.getWinners().then((winners) => {
+      this.winnersName.textContent = winners.length.toString();
+    })
+  }
+
+  private turnEngineToStarted = (car: Car) => {
+    return this.controller.turnEngine(car.id, 'started').then((movCar) => {
+      return movCar;
+    })
+  }
+
+  private turnEngineToStopped = (car: Car) => {
+    return this.controller.turnEngine(car.id, 'stopped').then((movCar) => {
+      return movCar;
+    })
+  }
+
+  private turnEngineToDrive = (movCar: MovingCar) => {
+    this.controller.turnEngineToDrive(movCar.id, 'drive').then(() => {
+      console.log(`the car with id ${movCar.id} is okay`);
+    }).catch(() => {
+      console.log(`the car with id ${movCar.id} is broken`);
+    })
+  }
+
+  private displayCars = () => {
+    this.carComponentWrapper.innerHTML = ''
+    this.controller.getCars().then((cars) => {
+      const paginatedCars = this.updatePagination(cars)
+      paginatedCars.forEach((car) => {
+        const newCar = new CarComponent(car)
+        let request: number | undefined;
+        newCar.stopButton.disabled = true;
+        newCar.carEl.id = String(car.id);
+        newCar.selectButton.addEventListener('click', () => {
+          this.controller.changeSelectedCar(car)
+          this.carUpdateInputText.value = newCar.carName.innerHTML;
+          this.carUpdateButton.disabled = false;
+        })
+        newCar.removeButton.addEventListener('click', () => {
+          this.deleteCar(car)
+        })
+        newCar.startButton.addEventListener('click', () => {
+          newCar.stopButton.disabled = false;
+          newCar.startButton.disabled = true;
+          this.turnEngineToStarted(car).then((movCar) => {
+            this.turnEngineToDrive(movCar)
+            const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
+            request = this.controller.animationHandler(duration, newCar.carEl) //return only once?
+          })
+        })
+        newCar.stopButton.addEventListener('click', () => {
+          newCar.startButton.disabled = false;
+          newCar.stopButton.disabled = true;
+          this.turnEngineToStopped(car).then((movCar) => {
+            const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
+            this.controller.animationHandler(duration, newCar.carEl, request) //stops the car but next race automatically puts the cat to the beginning of the road
+          })
+        })
+        this.carComponentWrapper.appendChild(newCar.giveCar())
+      })
+    })
+  }
+
   //pagination
-  updatePagination = (cars: GetCarsResponse) => {
+  private updatePagination = (cars: GetCarsResponse) => {
     const paginationLimit = 7;
-    const pageCount = Math.ceil(cars.length / paginationLimit); //44 / 7 = 9
+    const pageCount = Math.ceil(cars.length / paginationLimit);
     const currentPage = this.getCurrentPage();
     this.currentPageNumber.textContent = currentPage.toString();
 
@@ -347,33 +355,30 @@ export class GarageView implements View {
     if (currentRangeMax > cars.length) { currentRangeMax = cars.length; }
     return cars.slice(currentRangeMin, currentRangeMax)
   }
-
-  nextPage = () => {
+  private nextPage = () => {
     const currentPage = this.getCurrentPage()
     this.setCurrentPage(currentPage + 1)
     this.displayCars()
   }
-
-  prevPage = () => {
+  private prevPage = () => {
     const currentPage = this.getCurrentPage()
     this.setCurrentPage(currentPage - 1)
     this.displayCars()
   }
-
-  setCurrentPage(page: number) {
+  private setCurrentPage(page: number) {
     this.controller.setCurrentPage(page)
   }
-  getCurrentPage() {
+  private getCurrentPage() {
     return this.controller.getCurrentPage()
   }
 
   //winners methods
-  getWinners = () => {
+
+  //not fully implemented, only get the standard first winner and delete it from table on car deletion
+  private getWinners = () => {
     this.controller.getWinners().then((winners) => {
-      console.log(winners);
       this.winnersCounterNumber.textContent = winners.length.toString()
-      //for debug
-      let place = 0
+      let place = 0 //debug
       if (winners) {
         this.winnersPlace.innerHTML = ''
         this.winnersColor.innerHTML = ''
@@ -399,102 +404,97 @@ export class GarageView implements View {
             colorDiv.textContent = winnerCar.color
             winDiv.textContent = winnerCar.wins.toString()
             nameDiv.textContent = winnerCar.name.toString()
-            placeDiv.textContent = place.toString() //debug
-
+            placeDiv.textContent = place.toString()
             this.winnersPlace.appendChild(placeDiv)
             this.winnersColor.appendChild(colorDiv)
             this.winnersName.appendChild(nameDiv)
             this.winnersWins.appendChild(winDiv)
             this.winnersTime.appendChild(timeDiv)
-
-          }).catch(() => {
-            console.log('car was deleted')
           })
         })
-      } else {
-        return
       }
-
     })
   }
 
-
   //basic view methods
-  addGarageElements() {
+  private addGarageElements() {
     this.root.appendChild(this.pageButtonsWrapper)
     this.root.appendChild(this.garageSection)
   }
 
-  addWinnersElements() {
+  private addWinnersElements() {
     this.root.appendChild(this.winnersSection)
     this.winnersSection.classList.add('hidden')
   }
 
-  changeView() {
+  private changeView() {
     this.garageSection.classList.toggle('hidden')
     this.winnersSection.classList.toggle('hidden')
   }
 
-  //race
+  mount() {
+    this.addGarageElements()
+    this.addWinnersElements()
+    this.updateNumberofCars()
+    this.displayCars()
+    this.getCurrentPage()
+    this.getWinners()
+  }
 
-  async handleRacing(raceMode: string) {
-    this.controller.getCars().then((cars) => {
+  //race
+  private handleRacing(raceMode: string) {
+    const carsTimeArray: MovingCar[] = [];
+    const promiseArray: Promise<MovingCar | void>[] = [];
+    return this.controller.getCars().then((cars: GetCarsResponse) => {
       const paginatedCars = this.updatePagination(cars)
-      const carsTimeArray: MovingCar[] = [];
-      let winner: MovingCar;
       paginatedCars.forEach((car) => {
         let request: number;
-        const theCar = document.getElementById(String(car.id)) as unknown as SVGSVGElement;
+        const theCarImg = document.getElementById(String(car.id)) as unknown as SVGSVGElement;
         if (raceMode === 'race') {
-
           this.startRace.disabled = true;
           this.resetButton.disabled = false;
-          this.controller.turnEngine(car.id, 'started').then((movCar) => {
-
-            const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
-            carsTimeArray.push(movCar)
-            request = this.controller.animationHandler(duration, theCar)
-
-            this.controller.turnEngineToDrive(movCar.id, 'drive').then(() => {
-              console.log('my engine is okay');
-            }).catch(() => {
-              console.log('my engine is broken but i literally do not care');
-            })
-          }).then(() => {
-            winner = this.controller.figureOutTheWinner(carsTimeArray)
-          })
+            promiseArray.push(this.turnEngineToStarted(car).then((movCar) => {
+              this.turnEngineToDrive(movCar)
+              carsTimeArray.push(movCar)
+              const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
+              request = this.controller.animationHandler(duration, theCarImg) //return only once?
+            }))
         } else if (raceMode === 'reset') {
           this.startRace.disabled = false;
           this.resetButton.disabled = true;
-          this.controller.turnEngine(car.id, 'stopped').then((movCar) => {
+          this.turnEngineToStopped(car).then((movCar) => {
             const duration = Math.round((movCar.distance / movCar.velocity / 1000) * 100) / 100;
-            request = this.controller.animationHandler(duration, theCar, request)
+            this.controller.animationHandler(duration, theCarImg, request) //stops the car but next race automatically puts the cat to the beginning of the road
           })
         }
       })
-      setTimeout(() => {
-        const winnerDuration = Math.round((winner.distance / winner.velocity / 1000) * 100) / 100;
-        let winnerName: string;
-        let winnerId: string;
-        this.controller.getCar(winner.id).then((car) => {
-          winnerName = car.name
-          winnerId = car.id.toString()
-        }).then(() => {
-          setTimeout(() => {
-            this.winnerMessage.textContent = `The winner is car with name ${winnerName} and id ${winnerId}!`
-            this.winnerMessage.classList.remove('hidden')
-            setTimeout(() => {
-              this.winnerMessage.textContent = ''
-              this.winnerMessage.classList.add('hidden')
-            }, 4000);
-          }, winnerDuration * 1000);
-
-
-        })
-
-      }, 1000);
-
+    }).then(()=>{
+      return Promise.all(promiseArray).then(() =>{
+        return carsTimeArray
+      })
     })
+
+  }
+
+  displayWinner(winner: MovingCar){
+    const winnerDuration = Math.round((winner.distance / winner.velocity / 1000) * 100) / 100;
+    setTimeout(() => {
+      let winnerName: string;
+      let winnerId: string;
+      this.controller.getCar(winner.id).then((car) => {
+        winnerName = car.name
+        winnerId = car.id.toString()
+      }).then(() => {
+        setTimeout(() => {
+          this.winnerMessage.textContent = `The winner is car with name ${winnerName} and id ${winnerId}!`
+          this.winnerMessage.classList.remove('hidden')
+          setTimeout(() => {
+            this.winnerMessage.textContent = ''
+            this.winnerMessage.classList.add('hidden')
+          }, 4000);
+        }, winnerDuration * 1000);
+      })
+    }, winnerDuration);
   }
 
 

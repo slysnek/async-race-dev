@@ -8,8 +8,6 @@ $background-button-color: #4b586b;
 $background-button-disabled-color:rgb(45, 52, 62);
 $background-button-disabled-font-color:#a6aaae;
 
-
-
 html {
   font-size: $font-size;
   font-family: 'Roboto Mono';
@@ -19,7 +17,6 @@ html {
 body{
   background-color: $background-color;
 }
-
 
 button{
   margin: 4px;

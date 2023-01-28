@@ -1,10 +1,4 @@
-export type GetCarsResponse = [
-  {
-    name: string,
-    color: string,
-    id: number
-  }
-]
+export type GetCarsResponse = Car [];
 
 export type GetWinnersResponse = [
   {

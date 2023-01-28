@@ -15,7 +15,6 @@ export class EngineMethods {
       headers: { 'Content-Type': 'application/json' }
     });
     const textData: GetTurnEngineResponse = await data.json()
-    console.log(textData)
     return textData
   }
   //need to turn engine to 'started' first
@@ -24,7 +23,6 @@ export class EngineMethods {
       method: 'PATCH',
     });
     const textData:SuccessfulDrive = await data.json()
-    console.log(textData)
     return textData
   }
 }
