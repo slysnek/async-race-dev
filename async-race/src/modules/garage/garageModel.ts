@@ -1,76 +1,86 @@
-import { EngineMethods } from "../jsonMethods/engineMethods";
-import { GarageMethods } from "../jsonMethods/garageMethods";
-import { WinnersMethods } from "../jsonMethods/winnersMethods";
-import { GetCarsResponse, GetWinnersResponse, MovingCar } from "../types/data";
-import { Model } from "../types/model";
-import { Car } from "../types/data";
+import EngineMethods from '../jsonMethods/engineMethods';
+import GarageMethods from '../jsonMethods/garageMethods';
+import WinnersMethods from '../jsonMethods/winnersMethods';
+import {
+  GetCarsResponse, GetWinnersResponse, MovingCar, Car,
+} from '../types/data';
+import { Model } from '../types/model';
 
-export class GarageModel implements Model {
-
+export default class GarageModel implements Model {
   cars: GetCarsResponse | undefined;
-  winners: GetWinnersResponse | undefined
-  randomName1: string[];
-  randomName2: string[];
-  selectedCar: Car;
-  movingCars: MovingCar[];
-  currentPage: number
 
-  engineAPI: EngineMethods = new EngineMethods;
-  garageAPI: GarageMethods = new GarageMethods;
-  winnersAPI: WinnersMethods = new WinnersMethods;
+  winners: GetWinnersResponse | undefined;
+
+  colorValues: string;
+
+  randomName1: string[];
+
+  randomName2: string[];
+
+  selectedCar: Car;
+
+  movingCars: MovingCar[];
+
+  currentPage: number;
+
+  engineAPI: EngineMethods = new EngineMethods();
+
+  garageAPI: GarageMethods = new GarageMethods();
+
+  winnersAPI: WinnersMethods = new WinnersMethods();
 
   constructor() {
+    this.colorValues = '0123456789ABCDEF';
     this.movingCars = [];
     this.currentPage = 1;
-    this.randomName1 = ['Mercedes', 'Ford', 'Lada', 'Porsche', 'Renault', 'Chevrolet', 'Toyota', 'Mazda', 'Lexus', 'BMW']
-    this.randomName2 = ['C600', 'Focus', 'Kalina', 'Cayene', 'Logan', 'Cruze', 'Camri', '6', 'RX510', 'X4']
+    this.randomName1 = ['Mercedes', 'Ford', 'Lada', 'Porsche', 'Renault', 'Chevrolet', 'Toyota', 'Mazda', 'Lexus', 'BMW'];
+    this.randomName2 = ['C600', 'Focus', 'Kalina', 'Cayene', 'Logan', 'Cruze', 'Camri', '6', 'RX510', 'X4'];
     this.selectedCar = {
       name: 'no car',
       color: '000000',
-      id: 0
-    }
+      id: 0,
+    };
   }
 
   getCars() {
     return this.garageAPI.getCars().then((data) => {
       this.cars = data;
-      return this.cars
-    })
+      return this.cars;
+    });
   }
 
   getCar(id: number) {
-    return this.garageAPI.getCar(id)
+    return this.garageAPI.getCar(id);
   }
 
   createCar(name: string, color: string) {
     return this.garageAPI.createNewCar(name, color).then((data) => {
-      this.cars?.push(data)
+      this.cars?.push(data);
       return this.cars;
-    })
+    });
   }
 
   create100cars() {
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 100; i += 1) {
       const randomName = this.createRandomName();
       const randomColor = this.createRandomColor();
       this.garageAPI.createNewCar(randomName, randomColor).then((data) => {
-        this.cars?.push(data)
-      })
+        this.cars?.push(data);
+      });
     }
-    return this.cars
+    return this.cars;
   }
 
   createRandomName() {
     const firstName = this.randomName1[Math.floor(Math.random() * 10)];
     const secondName = this.randomName2[Math.floor(Math.random() * 10)];
-    return firstName + ' ' + secondName;
+    return `${firstName} ${secondName}`;
   }
 
   createRandomColor() {
-    const values = '0123456789ABCDEF';
     let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += values[Math.floor(Math.random() * 16)];
+    for (let i = 0; i < 6; i += 1) {
+      color += this.colorValues[Math.floor(Math.random() * 16)];
     }
     return color;
   }
@@ -82,18 +92,18 @@ export class GarageModel implements Model {
   }
 
   updateSelectedCar(color: string, name: string): Promise<Car> {
-    const id = this.selectedCar.id;
+    const { id } = this.selectedCar;
     return this.garageAPI.updateCar(id, color, name).then((car) => {
-      this.selectedCar.color = car.color
-      this.selectedCar.name = car.name
-      return car
-    })
+      this.selectedCar.color = car.color;
+      this.selectedCar.name = car.name;
+      return car;
+    });
   }
 
   deleteCar(id: number) {
     return this.garageAPI.deleteCar(id).then(() => {
-      this.cars?.filter((el) => el.id !== id)
-    })
+      this.cars?.filter((el) => el.id !== id);
+    });
   }
 
   turnEngine(id: number, status: 'started' | 'stopped') {
@@ -101,71 +111,64 @@ export class GarageModel implements Model {
       const movingCar: MovingCar = {
         velocity: value.velocity,
         distance: value.distance,
-        id: id
-      }
+        id,
+      };
       if (movingCar.velocity !== 0) {
         this.movingCars.push(movingCar);
       } else {
-        this.movingCars = this.movingCars.filter((car) => car.id !== id)
+        this.movingCars = this.movingCars.filter((car) => car.id !== id);
       }
       return movingCar;
-    })
+    });
   }
 
   turnEngineToDrive(id: number, status: 'drive') {
-    return this.engineAPI.turnEngineToDrive(id, status)
+    return this.engineAPI.turnEngineToDrive(id, status);
   }
 
   setCurrentPage = (page: number) => {
     this.currentPage = page;
-  }
+  };
 
-  getCurrentPage = () => {
-    return this.currentPage;
-  }
+  getCurrentPage = () => this.currentPage;
 
-  getWinners = () => {
-    return this.winnersAPI.getWinners().then((data) => {
-      this.winners = data;
-      return this.winners
-    })
-  }
+  getWinners = () => this.winnersAPI.getWinners().then((data) => {
+    this.winners = data;
+    return this.winners;
+  });
 
-  deleteWinner = (id: number) => {
-    return this.winnersAPI.deleteWinner(id).then(() => {
-      this.winners?.filter((el) => el.id !== id)
-    })
-  }
-  
+  deleteWinner = (id: number) => this.winnersAPI.deleteWinner(id).then(() => {
+    this.winners?.filter((el) => el.id !== id);
+  });
+
   animationHandler = (duration: number, carImg: SVGSVGElement, idRequest?: number) => {
-    if (idRequest) {
-      cancelAnimationFrame(idRequest)
+    function timing(timeFraction: number) {
+      return timeFraction ** 2;
     }
-    const start = performance.now()
+    function draw(progress: number) {
+      const roadProgress = progress * 100;
+      carImg.style.left = `calc(${roadProgress}% - ${roadProgress}px)`;
+    }
+
+    if (idRequest) {
+      cancelAnimationFrame(idRequest);
+    }
+    const start = performance.now();
     const request = requestAnimationFrame(function animate(time) {
       let timeFraction = (time - start) / (duration * 1000);
       if (timeFraction > 1) timeFraction = 1;
-      const progress = timing(timeFraction)
-      draw(progress)
+      const progress = timing(timeFraction);
+      draw(progress);
 
       if (timeFraction < 1) {
         requestAnimationFrame(animate);
       }
-    })
+    });
     return request;
+  };
 
-    function timing(timeFraction: number) {
-      return Math.pow(timeFraction, 2)
-    }
-    function draw(progress: number) {
-      const roadProgress = progress * 100
-      carImg.style.left = `calc(${roadProgress}% - ${roadProgress}px)`
-    }
+    figureOutTheWinner(racingCars: MovingCar[]) {
+    racingCars.sort((a, b) => (a.velocity < b.velocity ? 1 : -1));
+    return racingCars[0];
   }
-
-  figureOutTheWinner(racingCars: MovingCar[]) {
-    racingCars.sort((a, b) => a.velocity < b.velocity ? 1 : -1)
-    return racingCars[0]
-  }
-
 }
