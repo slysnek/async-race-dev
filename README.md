@@ -1,2 +1,1 @@
-# slysnek-JSFE2022Q3
-Private repository for @slysnek
+A project designed to test asynchronous code. Setup server is required - https://github.com/mikhama/async-race-api
